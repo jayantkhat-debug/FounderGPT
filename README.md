@@ -33,7 +33,10 @@ FounderGPT helps founders:
 - Develop marketing strategies
 - Prepare investor pitches
 - Create business plans
+## 🌐 Live Demo
 
+🚀 FounderGPT  
+https://foundergpt.streamlit.app/
 ## Author
 
 Jayant Khatri
