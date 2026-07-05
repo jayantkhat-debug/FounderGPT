@@ -16,6 +16,11 @@ FounderGPT X is designed as a premium founder operating system, not another chat
 - Founder-first strategic chat
 - Critical assumption testing
 - Project and memory-ready backend architecture
+- Clerk-ready sign up, login, logout, and protected-route architecture
+- PostgreSQL persistence with Alembic migrations
+- Multi-project startup workspace
+- Founder memory per project
+- Conversation and message persistence per project
 - Business plan, pitch deck, market research, and fundraising roadmap foundations
 - Modular AI agent system for CEO, CTO, Product, VC, Marketing, Sales, Finance, Legal, Growth, Operations, UX, and Engineering roles
 - Secure server-side NVIDIA Build API integration
@@ -58,10 +63,26 @@ NVIDIA_BASE_URL="https://integrate.api.nvidia.com/v1"
 NVIDIA_MODEL="meta/llama-3.1-70b-instruct"
 ```
 
+Set PostgreSQL and Clerk values in `backend/.env`:
+
+```text
+DATABASE_URL="postgresql+psycopg://foundergpt:foundergpt@localhost:5432/foundergpt"
+CLERK_ISSUER="https://your-clerk-instance.clerk.accounts.dev"
+CLERK_JWKS_URL="https://your-clerk-instance.clerk.accounts.dev/.well-known/jwks.json"
+CLERK_AUDIENCE=""
+```
+
 Install backend dependencies:
 
 ```powershell
 python -m pip install -r backend\requirements.txt
+```
+
+Run database migrations:
+
+```powershell
+cd backend
+python -m alembic -c alembic.ini upgrade head
 ```
 
 Install frontend dependencies:
@@ -102,6 +123,7 @@ http://127.0.0.1:8000/api/v1/health
 ## Roadmap
 
 - Phase 1: Authentication, dashboard, projects, AI chat, memory, NVIDIA integration
+- Phase 2 Foundation: Clerk authentication, PostgreSQL persistence, Alembic migrations, multi-project workspaces, founder memory, persisted conversations
 - Phase 2: Business plan generator, pitch deck generator, market research, competitor analysis, financial models
 - Phase 3: Investor CRM, task management, calendar, notifications, founder memory
 - Phase 4: Multi-agent collaboration, voice, documents, image generation, code generation

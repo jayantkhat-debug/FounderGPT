@@ -12,20 +12,23 @@ import {
   Settings,
   Users,
 } from "lucide-react";
+import Link from "next/link";
+
+import { AuthActions } from "@/components/layout/auth-actions";
 
 const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard },
-  { label: "Projects", icon: FolderKanban },
-  { label: "AI Chat", icon: Bot },
-  { label: "Business Plan", icon: FileText },
-  { label: "Pitch Deck", icon: BarChart3 },
-  { label: "Market Research", icon: LineChart },
-  { label: "Competitors", icon: Users },
-  { label: "Financial Model", icon: BriefcaseBusiness },
-  { label: "YC Application", icon: ClipboardList },
-  { label: "Investor CRM", icon: Landmark },
-  { label: "Tasks", icon: CalendarDays },
-  { label: "Settings", icon: Settings },
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Projects", href: "/projects", icon: FolderKanban },
+  { label: "AI Chat", href: "/dashboard", icon: Bot },
+  { label: "Business Plan", href: "/dashboard", icon: FileText },
+  { label: "Pitch Deck", href: "/dashboard", icon: BarChart3 },
+  { label: "Market Research", href: "/dashboard", icon: LineChart },
+  { label: "Competitors", href: "/dashboard", icon: Users },
+  { label: "Financial Model", href: "/dashboard", icon: BriefcaseBusiness },
+  { label: "YC Application", href: "/dashboard", icon: ClipboardList },
+  { label: "Investor CRM", href: "/dashboard", icon: Landmark },
+  { label: "Tasks", href: "/dashboard", icon: CalendarDays },
+  { label: "Settings", href: "/dashboard", icon: Settings },
 ];
 
 export function Sidebar() {
@@ -40,7 +43,8 @@ export function Sidebar() {
           const Icon = item.icon;
           const active = index === 0;
           return (
-            <button
+            <Link
+              href={item.href}
               key={item.label}
               className={`flex h-10 w-full items-center gap-3 rounded-md px-3 text-left text-sm transition ${
                 active ? "bg-white/10 text-founder-ink" : "text-muted hover:bg-white/[0.07] hover:text-founder-ink"
@@ -48,10 +52,13 @@ export function Sidebar() {
             >
               <Icon className="h-4 w-4" aria-hidden />
               {item.label}
-            </button>
+            </Link>
           );
         })}
       </nav>
+      <div className="mt-8 border-t border-border pt-4">
+        <AuthActions />
+      </div>
     </aside>
   );
 }

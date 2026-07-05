@@ -56,7 +56,7 @@ flowchart LR
 ## Product Modules
 
 - Dashboard: founder command center, project health, next actions, runway, risks.
-- Projects: startup profile, target users, market, competitors, revenue model, stage.
+- Projects: startup profile, description, stage, target users, market, competitors, revenue model, owner-scoped memory.
 - AI Chat: multi-agent advice with challenge-oriented behavior.
 - Business Plan: structured generated artifact backed by project memory.
 - Pitch Deck: slide outline, narrative, export-ready content.
@@ -69,6 +69,7 @@ flowchart LR
 ## Security Baseline
 
 - Clerk JWT validation on every protected backend route.
+- Clerk middleware protects frontend dashboard and project routes when Clerk is configured.
 - Environment-only secret loading.
 - Request size limits and Pydantic validation.
 - Per-user rate limiting hooks.

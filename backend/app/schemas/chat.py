@@ -12,6 +12,7 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     message_id: UUID | None = None
+    conversation_id: UUID | None = None
     agent_key: str
     content: str
     follow_up_questions: list[str] = Field(default_factory=list)

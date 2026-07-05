@@ -6,6 +6,14 @@ Base path: `/api/v1`
 
 Authentication: `Authorization: Bearer <clerk_jwt>` for every protected route.
 
+Development auth: `Authorization: Bearer dev` is accepted only when `APP_ENV=development`.
+
+## Users
+
+### GET `/users/me`
+
+Returns the authenticated user, creating a local user record from Clerk claims when needed.
+
 ## Health
 
 ### GET `/health`
@@ -26,8 +34,9 @@ Request:
 
 ```json
 {
-  "startup_name": "FounderGPT X",
-  "idea": "AI operating system for founders",
+  "name": "FounderGPT X",
+  "description": "AI operating system for founders",
+  "stage": "Building",
   "target_users": "First-time and repeat startup founders",
   "market": "Startup tooling",
   "revenue_model": "Subscription",
@@ -37,11 +46,30 @@ Request:
 
 ### GET `/projects/{project_id}`
 
-Returns one project with core memory summary.
+Returns one authenticated user's project.
 
 ### PATCH `/projects/{project_id}`
 
 Updates project profile fields.
+
+## Founder Memory
+
+### GET `/projects/{project_id}/memory`
+
+Returns structured project memory:
+
+- Startup Name
+- Problem
+- Solution
+- Customer
+- Revenue Model
+- Pricing
+- Competitors
+- Goals
+
+### PUT `/projects/{project_id}/memory`
+
+Updates structured project memory.
 
 ## Conversations
 
@@ -52,6 +80,10 @@ Lists project conversations.
 ### POST `/projects/{project_id}/conversations`
 
 Creates a conversation.
+
+### GET `/projects/{project_id}/conversations/{conversation_id}/messages`
+
+Loads persisted conversation messages for a project.
 
 ## AI Chat
 
@@ -106,6 +138,7 @@ Response:
 ```json
 {
   "message_id": "uuid",
+  "conversation_id": "uuid",
   "agent_key": "ceo",
   "content": "Actionable, critical founder guidance.",
   "follow_up_questions": [],

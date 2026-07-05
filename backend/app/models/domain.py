@@ -3,7 +3,7 @@ import uuid
 from datetime import date, datetime
 from typing import Any
 
-from sqlalchemy import Date, DateTime, Enum, ForeignKey, Integer, Numeric, String, Text, func
+from sqlalchemy import Date, DateTime, Enum, ForeignKey, Integer, Numeric, String, Text, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -99,16 +99,37 @@ class Project(Base, TimestampMixin):
     owner_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), index=True)
     startup_name: Mapped[str] = mapped_column(String(180))
     idea: Mapped[str] = mapped_column(Text)
+    description: Mapped[str | None] = mapped_column(Text)
     target_users: Mapped[str | None] = mapped_column(Text)
     market: Mapped[str | None] = mapped_column(Text)
     competitors: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, default=list)
     revenue_model: Mapped[str | None] = mapped_column(Text)
     funding_stage: Mapped[str | None] = mapped_column(String(80))
+    stage: Mapped[str] = mapped_column(String(80), default="Idea")
     status: Mapped[ProjectStatus] = mapped_column(Enum(ProjectStatus), default=ProjectStatus.draft)
     health_score: Mapped[int | None] = mapped_column(Integer)
 
     owner: Mapped[User] = relationship(back_populates="projects")
     conversations: Mapped[list["Conversation"]] = relationship(back_populates="project")
+    memory: Mapped["ProjectMemory | None"] = relationship(back_populates="project", uselist=False)
+
+
+class ProjectMemory(Base, TimestampMixin):
+    __tablename__ = "project_memories"
+    __table_args__ = (UniqueConstraint("project_id", name="uq_project_memories_project_id"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), index=True)
+    startup_name: Mapped[str | None] = mapped_column(String(180))
+    problem: Mapped[str | None] = mapped_column(Text)
+    solution: Mapped[str | None] = mapped_column(Text)
+    customer: Mapped[str | None] = mapped_column(Text)
+    revenue_model: Mapped[str | None] = mapped_column(Text)
+    pricing: Mapped[str | None] = mapped_column(Text)
+    competitors: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, default=list)
+    goals: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, default=list)
+
+    project: Mapped[Project] = relationship(back_populates="memory")
 
 
 class Conversation(Base, TimestampMixin):

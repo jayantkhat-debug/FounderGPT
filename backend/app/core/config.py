@@ -19,6 +19,7 @@ class Settings(BaseSettings):
 
     clerk_issuer: str = ""
     clerk_jwks_url: str = ""
+    clerk_audience: str = ""
 
     nvidia_api_key: str = ""
     nvidia_base_url: AnyUrl | str = "https://integrate.api.nvidia.com/v1"

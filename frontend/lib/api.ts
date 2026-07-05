@@ -26,6 +26,45 @@ export type StartupIdeaChatResponse = {
   response: string;
 };
 
+export type Project = {
+  id: string;
+  name: string;
+  description: string;
+  stage: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ProjectMemory = {
+  id: string;
+  project_id: string;
+  startup_name: string | null;
+  problem: string | null;
+  solution: string | null;
+  customer: string | null;
+  revenue_model: string | null;
+  pricing: string | null;
+  competitors: Record<string, unknown>[];
+  goals: Record<string, unknown>[];
+};
+
+export type Conversation = {
+  id: string;
+  project_id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PersistedMessage = {
+  id: string;
+  conversation_id: string;
+  agent_key: string | null;
+  role: "system" | "user" | "assistant" | "tool";
+  content: string;
+  created_at: string;
+};
+
 type RequestOptions = {
   token: string;
   body?: unknown;
@@ -69,4 +108,34 @@ export async function evaluateStartupIdea(input: {
       conversation_history: input.conversationHistory,
     },
   });
+}
+
+export async function listProjects(token = process.env.NEXT_PUBLIC_DEV_API_TOKEN ?? "dev") {
+  return apiRequest<Project[]>("/projects", { token });
+}
+
+export async function createProject(
+  input: { name: string; description: string; stage: string },
+  token = process.env.NEXT_PUBLIC_DEV_API_TOKEN ?? "dev",
+) {
+  return apiRequest<Project>("/projects", {
+    token,
+    body: input,
+  });
+}
+
+export async function getProjectMemory(projectId: string, token = process.env.NEXT_PUBLIC_DEV_API_TOKEN ?? "dev") {
+  return apiRequest<ProjectMemory>(`/projects/${projectId}/memory`, { token });
+}
+
+export async function listConversations(projectId: string, token = process.env.NEXT_PUBLIC_DEV_API_TOKEN ?? "dev") {
+  return apiRequest<Conversation[]>(`/projects/${projectId}/conversations`, { token });
+}
+
+export async function listMessages(
+  projectId: string,
+  conversationId: string,
+  token = process.env.NEXT_PUBLIC_DEV_API_TOKEN ?? "dev",
+) {
+  return apiRequest<PersistedMessage[]>(`/projects/${projectId}/conversations/${conversationId}/messages`, { token });
 }

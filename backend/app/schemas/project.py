@@ -1,12 +1,14 @@
 from typing import Any
+from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
 
 class ProjectCreate(BaseModel):
-    startup_name: str = Field(min_length=2, max_length=180)
-    idea: str = Field(min_length=10, max_length=12000)
+    name: str = Field(min_length=2, max_length=180)
+    description: str = Field(min_length=2, max_length=12000)
+    stage: str = Field(default="Idea", min_length=2, max_length=80)
     target_users: str | None = Field(default=None, max_length=8000)
     market: str | None = Field(default=None, max_length=8000)
     competitors: list[dict[str, Any]] = Field(default_factory=list)
@@ -15,8 +17,9 @@ class ProjectCreate(BaseModel):
 
 
 class ProjectUpdate(BaseModel):
-    startup_name: str | None = Field(default=None, min_length=2, max_length=180)
-    idea: str | None = Field(default=None, min_length=10, max_length=12000)
+    name: str | None = Field(default=None, min_length=2, max_length=180)
+    description: str | None = Field(default=None, min_length=2, max_length=12000)
+    stage: str | None = Field(default=None, min_length=2, max_length=80)
     target_users: str | None = Field(default=None, max_length=8000)
     market: str | None = Field(default=None, max_length=8000)
     competitors: list[dict[str, Any]] | None = None
@@ -28,8 +31,9 @@ class ProjectRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
-    startup_name: str
-    idea: str
+    name: str
+    description: str
+    stage: str
     target_users: str | None
     market: str | None
     competitors: list[dict[str, Any]]
@@ -37,3 +41,5 @@ class ProjectRead(BaseModel):
     funding_stage: str | None
     status: str
     health_score: int | None
+    created_at: datetime
+    updated_at: datetime

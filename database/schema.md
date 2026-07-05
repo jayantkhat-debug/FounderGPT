@@ -19,8 +19,10 @@ PostgreSQL is the source of truth for founder memory, project state, conversatio
 
 - `id`: UUID primary key
 - `owner_id`: UUID foreign key to `users.id`
-- `startup_name`: text
-- `idea`: text
+- `startup_name`: text, exposed as project `name`
+- `idea`: text, maintained for strategy context
+- `description`: text nullable
+- `stage`: text
 - `target_users`: text nullable
 - `market`: text nullable
 - `competitors`: jsonb default `[]`
@@ -28,6 +30,21 @@ PostgreSQL is the source of truth for founder memory, project state, conversatio
 - `funding_stage`: text nullable
 - `status`: enum draft, validating, building, fundraising, scaling, archived
 - `health_score`: integer nullable
+- `created_at`: timestamptz
+- `updated_at`: timestamptz
+
+### project_memories
+
+- `id`: UUID primary key
+- `project_id`: UUID unique foreign key to `projects.id`
+- `startup_name`: text nullable
+- `problem`: text nullable
+- `solution`: text nullable
+- `customer`: text nullable
+- `revenue_model`: text nullable
+- `pricing`: text nullable
+- `competitors`: jsonb default `[]`
+- `goals`: jsonb default `[]`
 - `created_at`: timestamptz
 - `updated_at`: timestamptz
 
@@ -97,6 +114,7 @@ PostgreSQL is the source of truth for founder memory, project state, conversatio
 
 - `users.clerk_user_id`
 - `projects.owner_id`
+- `project_memories.project_id`
 - `conversations.project_id`
 - `messages.conversation_id, messages.created_at`
 - `memories.project_id, memories.kind`
@@ -106,6 +124,7 @@ PostgreSQL is the source of truth for founder memory, project state, conversatio
 ## Data Principles
 
 - Conversation history is append-only.
-- Memory is editable and confidence-scored.
+- Structured founder memory is editable per project.
+- Additional extracted memory is confidence-scored.
 - Generated documents store structured JSON first; PDF, Word, PowerPoint, Markdown, and JSON exports are views over stored content.
 - User-owned project data is always scoped by authenticated owner.

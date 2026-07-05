@@ -15,6 +15,16 @@ Tagline: Build. Validate. Launch. Fund.
 7. Add agent registry and initial prompts for CEO, CTO, Product, VC, Marketing, Sales, Finance, Legal, Growth, Operations, UX, and Engineering.
 8. Add Next.js app shell, dashboard page, sidebar navigation, glass cards, loading-ready project views, and API client scaffolding.
 
+## Phase 2 Foundation
+
+1. Add Clerk-ready authentication surfaces for sign up, login, logout, and protected routes.
+2. Add PostgreSQL persistence through SQLAlchemy models and Alembic migrations.
+3. Persist users from Clerk claims.
+4. Add owner-scoped startup projects with name, description, stage, created date, and updated date.
+5. Add structured founder memory per project.
+6. Persist project conversations and messages.
+7. Add frontend project workspace for creating and listing startup projects.
+
 ## Phase 2: Generators
 
 - Business plan generator

@@ -1,11 +1,21 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
+from app.db.session import get_db
+from app.models import MessageRole
 from app.schemas.chat import ChatRequest, ChatResponse, StartupIdeaChatRequest, StartupIdeaChatResponse
 from app.security.auth import AuthenticatedUser, get_current_user
 from app.services.nvidia_client import AIConfigurationError, AIProviderError
 from app.services.chat_service import chat_service
+from app.services.project_service import (
+    create_conversation,
+    get_owned_conversation,
+    get_owned_project,
+    store_message,
+)
+from app.services.user_service import get_or_create_user
 
 project_router = APIRouter()
 router = APIRouter()
@@ -15,10 +25,28 @@ router = APIRouter()
 async def chat_with_agent(
     project_id: UUID,
     request: ChatRequest,
-    _: AuthenticatedUser = Depends(get_current_user),
+    auth_user: AuthenticatedUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> ChatResponse:
-    _ = project_id
-    return chat_service.respond(request)
+    user = get_or_create_user(db, auth_user)
+    project = get_owned_project(db, user, project_id)
+    conversation = (
+        get_owned_conversation(db, project, request.conversation_id)
+        if request.conversation_id
+        else create_conversation(db, project, "Founder strategy session")
+    )
+    store_message(db, conversation, role=MessageRole.user, content=request.message, agent_key=request.agent_key)
+    response = chat_service.respond(request)
+    assistant_message = store_message(
+        db,
+        conversation,
+        role=MessageRole.assistant,
+        content=response.content,
+        agent_key=response.agent_key,
+    )
+    response.message_id = assistant_message.id
+    response.conversation_id = conversation.id
+    return response
 
 
 @router.post("/startup-idea", response_model=StartupIdeaChatResponse)
