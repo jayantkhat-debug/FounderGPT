@@ -105,6 +105,56 @@ Health check:
 http://127.0.0.1:8000/api/v1/health
 ```
 
+## Production Deployment
+
+### Backend: Railway
+
+The backend is deployed on Railway at `https://foundergpt-production.up.railway.app`
+
+**Requirements:**
+- PostgreSQL database
+- NVIDIA Build API key
+- Environment variables configured in Railway dashboard
+
+**Deployment:**
+1. Connect GitHub repository to Railway
+2. Configure environment variables
+3. Set start command: `python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+4. Deploy (automatic on push to main)
+
+See [backend/README.md](backend/README.md) for detailed setup.
+
+### Frontend: Vercel
+
+The frontend is deployed on Vercel at `https://foundergpt-x.vercel.app`
+
+**Requirements:**
+- NEXT_PUBLIC_API_BASE_URL pointing to Railway backend
+- Clerk keys (optional - works without auth)
+
+**Deployment:**
+1. Connect GitHub repository to Vercel
+2. Configure environment variables
+3. Deploy (automatic on push to main)
+
+See [frontend/README.md](frontend/README.md) for detailed setup.
+
+### Full Deployment Flow
+
+```
+Code Push to GitHub
+  ↓
+Railway builds & deploys backend
+  ↓
+Vercel builds & deploys frontend
+  ↓
+Frontend calls Railway API
+  ↓
+NVIDIA Build API evaluates startup ideas
+  ↓
+Founders get AI guidance
+```
+
 ## Roadmap
 
 - Phase 1: Authentication, dashboard, projects, AI chat, memory, NVIDIA integration
