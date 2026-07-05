@@ -76,7 +76,7 @@ export function StartupChat() {
           FounderGPT X chat
         </div>
         <p className="mt-2 text-sm leading-6 text-muted">
-          Send a startup idea and get a direct AI co-founder response powered by NVIDIA Build API.
+          Send a startup idea and get direct FounderGPT X guidance powered by NVIDIA Build API.
         </p>
       </div>
 
@@ -104,7 +104,7 @@ export function StartupChat() {
           <div className="flex justify-start">
             <div className="flex max-w-[78%] items-center gap-3 rounded-lg border border-border bg-black/25 px-4 py-3 text-sm text-muted">
               <Loader2 className="h-4 w-4 animate-spin text-founder-cyan" />
-              Thinking like a skeptical co-founder...
+              FounderGPT X is pressure-testing the idea...
             </div>
           </div>
         ) : null}

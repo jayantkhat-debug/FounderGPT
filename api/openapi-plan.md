@@ -1,5 +1,7 @@
 # FounderGPT X API Specification
 
+FounderGPT X — The AI Operating System for Founders.
+
 Base path: `/api/v1`
 
 Authentication: `Authorization: Bearer <clerk_jwt>` for every protected route.

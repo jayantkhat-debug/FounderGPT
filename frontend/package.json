@@ -1,6 +1,7 @@
 {
   "name": "foundergpt-x-frontend",
   "version": "0.1.0",
+  "description": "FounderGPT X — The AI Operating System for Founders",
   "private": true,
   "scripts": {
     "dev": "next dev",

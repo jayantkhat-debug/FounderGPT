@@ -1,5 +1,7 @@
 # FounderGPT X Database Schema
 
+FounderGPT X — The AI Operating System for Founders.
+
 PostgreSQL is the source of truth for founder memory, project state, conversations, documents, and planning artifacts.
 
 ## Tables

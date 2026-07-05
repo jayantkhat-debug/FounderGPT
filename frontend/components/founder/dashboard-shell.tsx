@@ -26,13 +26,13 @@ export function DashboardShell() {
             <div>
               <div className="mb-2 inline-flex items-center gap-2 rounded-md border border-border bg-white/[0.05] px-2.5 py-1 text-xs text-muted">
                 <Sparkles className="h-3.5 w-3.5 text-founder-cyan" />
-                Phase 1 command center
+                FounderGPT X
               </div>
               <h1 className="text-3xl font-semibold tracking-normal text-founder-ink md:text-5xl">
-                Build the startup that can survive investor scrutiny.
+                From idea to funded startup.
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-muted md:text-base">
-                FounderGPT X interviews, challenges, and turns founder context into strategy, tasks, documents, and fundraising assets.
+                The AI Operating System for Founders. Build. Validate. Launch. Fund.
               </p>
             </div>
             <Button className="w-full gap-2 md:w-auto">
@@ -58,6 +58,13 @@ export function DashboardShell() {
 
             <div className="grid gap-5">
               <GlassCard>
+                <div className="text-sm font-medium text-founder-ink">FounderGPT X</div>
+                <div className="mt-3 text-sm leading-6 text-muted">
+                  AI-powered. Founder-first. Built for disciplined startup execution.
+                </div>
+              </GlassCard>
+
+              <GlassCard>
                 <div className="flex items-center gap-2 text-sm font-medium text-founder-ink">
                   <CircleAlert className="h-4 w-4 text-founder-violet" />
                   Critical risks
@@ -82,6 +89,9 @@ export function DashboardShell() {
               </GlassCard>
             </div>
           </section>
+          <footer className="border-t border-border py-5 text-xs text-muted">
+            FounderGPT X. Copyright © 2026. All Rights Reserved.
+          </footer>
         </div>
       </main>
     </div>

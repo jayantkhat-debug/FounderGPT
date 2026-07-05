@@ -1,22 +1,24 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title="FounderGPT",
+    page_title="FounderGPT X",
     layout="wide"
 )
 
-st.title("🚀 FounderGPT")
+st.title("FounderGPT X")
 st.markdown("""
-### Build, Plan, and Launch Your Startup
+### The AI Operating System for Founders
 
-FounderGPT helps entrepreneurs:
+Build. Validate. Launch. Fund.
+
+FounderGPT X helps founders:
 - 💡 Generate startup ideas
 - 💰 Create business models
 - 📈 Build marketing plans
 - 🎤 Prepare investor pitches
 - 📄 Generate business plans
 """)
-st.subheader("Your AI Startup Co-Founder")
+st.subheader("From idea to funded startup. AI-powered. Founder-first.")
 col1, col2, col3 = st.columns(3)
 
 with col1:
@@ -26,7 +28,7 @@ with col2:
     st.metric("Startup Stages", "Idea → Funding")
 
 with col3:
-    st.metric("Version", "V1")
+    st.metric("Product", "FounderGPT X")
 
 # Sidebar
 st.sidebar.header("Startup Information")
@@ -295,4 +297,4 @@ Funds will be used for product development, marketing, and growth.
         st.success("Business Plan Generated!")
         st.write(plan)
         st.markdown("---")
-st.caption("FounderGPT • Built by Jayant")
+st.caption("FounderGPT X. Copyright © 2026. All Rights Reserved.")

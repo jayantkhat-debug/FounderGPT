@@ -1,5 +1,9 @@
 # FounderGPT X Implementation Plan
 
+Brand: FounderGPT X — The AI Operating System for Founders.
+
+Tagline: Build. Validate. Launch. Fund.
+
 ## Phase 1: Foundation
 
 1. Create production repository structure.

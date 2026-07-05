@@ -1,6 +1,10 @@
 # FounderGPT X Architecture
 
-FounderGPT X is an AI operating system for founders, not a generic chat app. The product is split into a Next.js frontend, a FastAPI backend, PostgreSQL persistence, and an AI orchestration layer that uses NVIDIA Build API through an OpenAI-compatible client.
+FounderGPT X is The AI Operating System for Founders, not a generic chat app. The product is split into a Next.js frontend, a FastAPI backend, PostgreSQL persistence, and an AI orchestration layer that uses NVIDIA Build API through an OpenAI-compatible client.
+
+Brand tagline: Build. Validate. Launch. Fund.
+
+Hero message: From idea to funded startup. AI-powered. Founder-first.
 
 ## Major Decisions
 
@@ -26,6 +30,18 @@ FounderGPT X is an AI operating system for founders, not a generic chat app. The
 - `database/`: schema documentation, migration notes, and future Alembic migrations.
 - `api/`: API contract documentation.
 - `prompts/` and `agents/`: canonical agent definitions and prompt strategy.
+
+## Architecture Diagram
+
+```mermaid
+flowchart LR
+    Founder[Founder] --> Frontend[FounderGPT X Frontend]
+    Frontend --> Backend[FounderGPT X API]
+    Backend --> Memory[(Founder Memory)]
+    Backend --> Nvidia[NVIDIA Build API]
+    Nvidia --> Backend
+    Backend --> Frontend
+```
 
 ## Request Flow
 

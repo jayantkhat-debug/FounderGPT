@@ -33,7 +33,7 @@ export function Sidebar() {
     <aside className="hidden min-h-screen w-72 border-r border-border bg-white/[0.035] px-4 py-5 backdrop-blur-xl lg:block">
       <div className="mb-8 px-2">
         <div className="text-sm font-semibold text-founder-ink">FounderGPT X</div>
-        <div className="mt-1 text-xs text-muted">AI co-founder operating system</div>
+        <div className="mt-1 text-xs text-muted">The AI Operating System for Founders</div>
       </div>
       <nav className="space-y-1">
         {navItems.map((item, index) => {
