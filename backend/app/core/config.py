@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     api_v1_prefix: str = "/api/v1"
     frontend_origin: str = "http://localhost:3000"
-    frontend_origins: str = "http://localhost:3000,http://localhost:3001"
+    frontend_origins: str = "http://localhost:3000,http://localhost:3001,http://localhost:3002"
 
     database_url: str = Field(default="postgresql+psycopg://foundergpt:foundergpt@localhost:5432/foundergpt")
 
