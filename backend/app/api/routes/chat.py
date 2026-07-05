@@ -3,8 +3,9 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.api.dependencies import get_current_db_user
 from app.db.session import get_db
-from app.models import MessageRole
+from app.models import MessageRole, User
 from app.schemas.chat import ChatRequest, ChatResponse, StartupIdeaChatRequest, StartupIdeaChatResponse
 from app.security.auth import AuthenticatedUser, get_current_user
 from app.services.nvidia_client import AIConfigurationError, AIProviderError
@@ -15,7 +16,6 @@ from app.services.project_service import (
     get_owned_project,
     store_message,
 )
-from app.services.user_service import get_or_create_user
 
 project_router = APIRouter()
 router = APIRouter()
@@ -25,10 +25,9 @@ router = APIRouter()
 async def chat_with_agent(
     project_id: UUID,
     request: ChatRequest,
-    auth_user: AuthenticatedUser = Depends(get_current_user),
+    user: User = Depends(get_current_db_user),
     db: Session = Depends(get_db),
 ) -> ChatResponse:
-    user = get_or_create_user(db, auth_user)
     project = get_owned_project(db, user, project_id)
     conversation = (
         get_owned_conversation(db, project, request.conversation_id)
@@ -36,7 +35,15 @@ async def chat_with_agent(
         else create_conversation(db, project, "Founder strategy session")
     )
     store_message(db, conversation, role=MessageRole.user, content=request.message, agent_key=request.agent_key)
-    response = chat_service.respond(request)
+    try:
+        response = chat_service.respond(request)
+    except AIConfigurationError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    except AIProviderError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="FounderGPT X could not get a response from NVIDIA Build API. Please retry.",
+        ) from exc
     assistant_message = store_message(
         db,
         conversation,

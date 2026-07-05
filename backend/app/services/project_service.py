@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import HTTPException, status
@@ -129,7 +130,9 @@ def get_owned_conversation(db: Session, project: Project, conversation_id: UUID)
 
 
 def get_conversation_messages(db: Session, conversation: Conversation) -> list[Message]:
-    return db.scalars(select(Message).where(Message.conversation_id == conversation.id).order_by(Message.created_at.asc())).all()
+    return db.scalars(
+        select(Message).where(Message.conversation_id == conversation.id).order_by(Message.created_at.asc())
+    ).all()
 
 
 def store_message(
@@ -141,7 +144,9 @@ def store_message(
     agent_key: str | None = None,
 ) -> Message:
     message = Message(conversation_id=conversation.id, role=role, content=content, agent_key=agent_key)
+    conversation.updated_at = datetime.now(UTC)
     db.add(message)
+    db.add(conversation)
     db.commit()
     db.refresh(message)
     return message

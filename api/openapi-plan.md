@@ -18,7 +18,7 @@ Returns the authenticated user, creating a local user record from Clerk claims w
 
 ### GET `/health`
 
-Returns service status and version.
+Returns service status.
 
 ## Projects
 
@@ -155,11 +155,15 @@ Returns available AI agents with key, name, specialty, and personality summary.
 
 ## Documents
 
+Planned API surface. Not implemented in the current backend.
+
 ### POST `/projects/{project_id}/documents/generate`
 
 Generates a structured artifact such as business plan, pitch deck outline, market research, or YC application draft.
 
 ## Tasks
+
+Planned API surface. Not implemented in the current backend.
 
 ### GET `/projects/{project_id}/tasks`
 
@@ -171,12 +175,24 @@ Creates a task.
 
 ## Error Shape
 
+FastAPI returns validation and application errors through the `detail` field. The frontend API client handles plain string details and validation arrays.
+
 ```json
 {
-  "error": {
-    "code": "validation_error",
-    "message": "Human-readable message",
-    "request_id": "uuid"
-  }
+  "detail": "Human-readable message"
+}
+```
+
+Validation errors use FastAPI's standard array format:
+
+```json
+{
+  "detail": [
+    {
+      "loc": ["body", "name"],
+      "msg": "String should have at least 2 characters",
+      "type": "string_too_short"
+    }
+  ]
 }
 ```

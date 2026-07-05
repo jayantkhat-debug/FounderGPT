@@ -9,6 +9,7 @@ export type Agent = {
 
 export type ChatResponse = {
   message_id: string | null;
+  conversation_id: string | null;
   agent_key: string;
   content: string;
   follow_up_questions: string[];
@@ -67,12 +68,13 @@ export type PersistedMessage = {
 
 type RequestOptions = {
   token: string;
+  method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   body?: unknown;
 };
 
 export async function apiRequest<T>(path: string, options: RequestOptions): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
-    method: options.body ? "POST" : "GET",
+    method: options.method ?? (options.body ? "POST" : "GET"),
     headers: {
       Authorization: `Bearer ${options.token}`,
       "Content-Type": "application/json",
@@ -84,13 +86,21 @@ export async function apiRequest<T>(path: string, options: RequestOptions): Prom
   if (!response.ok) {
     let message = `Request failed with ${response.status}`;
     try {
-      const data = (await response.clone().json()) as { detail?: string };
-      message = data.detail ?? message;
+      const data = (await response.clone().json()) as { detail?: string | { msg?: string }[] };
+      if (typeof data.detail === "string") {
+        message = data.detail;
+      } else if (Array.isArray(data.detail) && data.detail[0]?.msg) {
+        message = data.detail[0].msg;
+      }
     } catch {
       const text = await response.text();
       message = text || message;
     }
     throw new Error(message);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
   }
 
   return response.json() as Promise<T>;

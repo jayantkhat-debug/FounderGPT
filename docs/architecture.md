@@ -27,7 +27,8 @@ Hero message: From idea to funded startup. AI-powered. Founder-first.
 
 - `frontend/`: Next.js 15, React, TypeScript, TailwindCSS, Framer Motion, shadcn-compatible components.
 - `backend/`: FastAPI, Pydantic, SQLAlchemy, PostgreSQL, NVIDIA/OpenAI-compatible client.
-- `database/`: schema documentation, migration notes, and future Alembic migrations.
+- `backend/alembic/`: Alembic migrations for PostgreSQL.
+- `database/`: schema documentation and migration notes.
 - `api/`: API contract documentation.
 - `prompts/` and `agents/`: canonical agent definitions and prompt strategy.
 
@@ -47,7 +48,7 @@ flowchart LR
 
 1. Founder signs in with Clerk in the Next.js app.
 2. Frontend sends Clerk JWT to FastAPI.
-3. FastAPI validates JWT, rate limits the request, validates payloads with Pydantic, and loads project memory from PostgreSQL.
+3. FastAPI validates JWT, validates payloads with Pydantic, and loads project memory from PostgreSQL.
 4. Agent service builds a context package from project memory, conversation history, selected agent prompt, and requested workflow.
 5. NVIDIA Build API returns the response through the backend.
 6. Backend stores the assistant response, memory deltas, and structured artifacts.
@@ -72,7 +73,7 @@ flowchart LR
 - Clerk middleware protects frontend dashboard and project routes when Clerk is configured.
 - Environment-only secret loading.
 - Request size limits and Pydantic validation.
-- Per-user rate limiting hooks.
+- Rate limiting is a production-release requirement and is tracked separately.
 - Structured logs with request IDs and no secret payloads.
 - CORS restricted by environment configuration.
 
@@ -82,3 +83,7 @@ flowchart LR
 - No frontend access to NVIDIA credentials.
 - No generated artifacts without persisted project context.
 - No fake investor or market data presented as verified research.
+
+## Audit Notes
+
+The supported production runtime is `frontend/` plus `backend/`. Root-level Python prototype files are retained only as historical context and should not receive new product work.

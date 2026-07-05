@@ -61,3 +61,6 @@ Tagline: Build. Validate. Launch. Fund.
 - Every write payload has a Pydantic schema.
 - The AI service has retry and timeout boundaries.
 - UI has loading, empty, and error states before production release.
+- Owner-scoped project resources resolve through the authenticated database user.
+- Database sessions roll back on request failures.
+- API contract changes are mirrored in frontend types and documentation.

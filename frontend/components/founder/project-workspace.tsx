@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { CalendarDays, FolderKanban, Loader2, Plus } from "lucide-react";
 
@@ -15,23 +15,27 @@ export function ProjectWorkspace() {
     return <ClerkProjectWorkspace />;
   }
 
-  return <ProjectWorkspaceInner getToken={async () => process.env.NEXT_PUBLIC_DEV_API_TOKEN ?? "dev"} />;
+  return <ProjectWorkspaceInner tokenMode="development" />;
 }
 
 function ClerkProjectWorkspace() {
   const { getToken } = useAuth();
-  return (
-    <ProjectWorkspaceInner
-      getToken={async () => {
-        const token = await getToken();
-        if (!token) throw new Error("Missing Clerk session token.");
-        return token;
-      }}
-    />
-  );
+  const resolveClerkToken = useCallback(async () => {
+    const token = await getToken();
+    if (!token) throw new Error("Missing Clerk session token.");
+    return token;
+  }, [getToken]);
+
+  return <ProjectWorkspaceInner tokenMode="clerk" getToken={resolveClerkToken} />;
 }
 
-function ProjectWorkspaceInner({ getToken }: { getToken: () => Promise<string> }) {
+function ProjectWorkspaceInner({
+  getToken,
+  tokenMode,
+}: {
+  getToken?: () => Promise<string>;
+  tokenMode: "clerk" | "development";
+}) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -39,10 +43,17 @@ function ProjectWorkspaceInner({ getToken }: { getToken: () => Promise<string> }
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const resolveToken = useCallback(async () => {
+    if (getToken) {
+      return getToken();
+    }
+
+    return process.env.NEXT_PUBLIC_DEV_API_TOKEN ?? "dev";
+  }, [getToken]);
 
   useEffect(() => {
     let active = true;
-    getToken()
+    resolveToken()
       .then((token) => listProjects(token))
       .then((data) => {
         if (active) setProjects(data);
@@ -56,7 +67,7 @@ function ProjectWorkspaceInner({ getToken }: { getToken: () => Promise<string> }
     return () => {
       active = false;
     };
-  }, [getToken]);
+  }, [resolveToken, tokenMode]);
 
   async function handleCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -65,7 +76,7 @@ function ProjectWorkspaceInner({ getToken }: { getToken: () => Promise<string> }
     setIsCreating(true);
     setError(null);
     try {
-      const token = await getToken();
+      const token = await resolveToken();
       const project = await createProject({ name: name.trim(), description: description.trim(), stage }, token);
       setProjects((current) => [project, ...current]);
       setName("");

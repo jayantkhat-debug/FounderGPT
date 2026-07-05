@@ -6,23 +6,27 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class ProjectCreate(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
     name: str = Field(min_length=2, max_length=180)
     description: str = Field(min_length=2, max_length=12000)
     stage: str = Field(default="Idea", min_length=2, max_length=80)
     target_users: str | None = Field(default=None, max_length=8000)
     market: str | None = Field(default=None, max_length=8000)
-    competitors: list[dict[str, Any]] = Field(default_factory=list)
+    competitors: list[dict[str, Any]] = Field(default_factory=list, max_length=50)
     revenue_model: str | None = Field(default=None, max_length=4000)
     funding_stage: str | None = Field(default=None, max_length=80)
 
 
 class ProjectUpdate(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
     name: str | None = Field(default=None, min_length=2, max_length=180)
     description: str | None = Field(default=None, min_length=2, max_length=12000)
     stage: str | None = Field(default=None, min_length=2, max_length=80)
     target_users: str | None = Field(default=None, max_length=8000)
     market: str | None = Field(default=None, max_length=8000)
-    competitors: list[dict[str, Any]] | None = None
+    competitors: list[dict[str, Any]] | None = Field(default=None, max_length=50)
     revenue_model: str | None = Field(default=None, max_length=4000)
     funding_stage: str | None = Field(default=None, max_length=80)
 

@@ -1,9 +1,11 @@
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ChatRequest(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
     conversation_id: UUID | None = None
     agent_key: str = Field(default="ceo", min_length=2, max_length=80)
     message: str = Field(min_length=2, max_length=20000)
@@ -21,11 +23,15 @@ class ChatResponse(BaseModel):
 
 
 class ConversationMessage(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
     role: str = Field(pattern="^(user|assistant)$")
     content: str = Field(min_length=1, max_length=12000)
 
 
 class StartupIdeaChatRequest(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
     startup_idea: str = Field(min_length=10, max_length=12000)
     conversation_history: list[ConversationMessage] = Field(default_factory=list, max_length=24)
 

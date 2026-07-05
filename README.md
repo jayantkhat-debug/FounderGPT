@@ -32,10 +32,12 @@ FounderGPT X is separated into production-ready application boundaries:
 
 - `frontend/`: Next.js 15, React, TypeScript, TailwindCSS, Framer Motion
 - `backend/`: FastAPI, Pydantic, SQLAlchemy-ready domain structure, NVIDIA Build API client
-- `database/`: PostgreSQL schema documentation and future migration home
+- `backend/alembic/`: PostgreSQL migrations
+- `database/`: PostgreSQL schema documentation
 - `api/`: API specification and route contracts
 - `agents/` and `prompts/`: AI agent registry, roles, and prompt strategy
 - `docs/`: architecture and implementation planning
+- `docs/engineering-audit.md`: stabilization audit notes, known gaps, and verification commands
 
 ## Tech Stack
 
@@ -140,6 +142,14 @@ cd frontend
 npm.cmd run typecheck
 npm.cmd run build
 ```
+
+Engineering standards:
+
+- Keep production work inside `frontend/` and `backend/`.
+- Do not expose secrets to client code.
+- Protect owner-scoped resources at the API boundary.
+- Prefer small, typed modules over all-in-one files.
+- Update docs when architecture, setup, or API contracts change.
 
 ## License
 
