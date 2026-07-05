@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     api_v1_prefix: str = "/api/v1"
     frontend_origin: str = "http://localhost:3000"
+    frontend_origins: str = "http://localhost:3000,http://localhost:3001"
 
     database_url: str = Field(default="postgresql+psycopg://foundergpt:foundergpt@localhost:5432/foundergpt")
 
@@ -30,6 +31,13 @@ class Settings(BaseSettings):
     @cached_property
     def is_development(self) -> bool:
         return self.app_env.lower() == "development"
+
+    @cached_property
+    def cors_origins(self) -> list[str]:
+        origins = [origin.strip() for origin in self.frontend_origins.split(",") if origin.strip()]
+        if self.frontend_origin and self.frontend_origin not in origins:
+            origins.append(self.frontend_origin)
+        return origins
 
 
 settings = Settings()
