@@ -53,6 +53,37 @@ Creates a conversation.
 
 ## AI Chat
 
+### POST `/chat/startup-idea`
+
+Evaluates a founder's startup idea using FounderGPT X and NVIDIA Build API.
+
+Request:
+
+```json
+{
+  "startup_idea": "An AI operating system that helps founders go from idea to funded startup.",
+  "conversation_history": [
+    {
+      "role": "user",
+      "content": "I want to build this for first-time founders."
+    },
+    {
+      "role": "assistant",
+      "content": "Who is the narrowest initial user?"
+    }
+  ]
+}
+```
+
+Response:
+
+```json
+{
+  "agent": "FounderGPT X",
+  "response": "Critical, actionable startup advice from the AI co-founder."
+}
+```
+
 ### POST `/projects/{project_id}/chat`
 
 Sends a message to a selected agent.

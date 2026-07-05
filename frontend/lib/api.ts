@@ -16,6 +16,16 @@ export type ChatResponse = {
   suggested_tasks: Record<string, unknown>[];
 };
 
+export type ConversationMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+export type StartupIdeaChatResponse = {
+  agent: string;
+  response: string;
+};
+
 type RequestOptions = {
   token: string;
   body?: unknown;
@@ -33,9 +43,30 @@ export async function apiRequest<T>(path: string, options: RequestOptions): Prom
   });
 
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || `Request failed with ${response.status}`);
+    let message = `Request failed with ${response.status}`;
+    try {
+      const data = (await response.clone().json()) as { detail?: string };
+      message = data.detail ?? message;
+    } catch {
+      const text = await response.text();
+      message = text || message;
+    }
+    throw new Error(message);
   }
 
   return response.json() as Promise<T>;
+}
+
+export async function evaluateStartupIdea(input: {
+  startupIdea: string;
+  conversationHistory: ConversationMessage[];
+  token?: string;
+}) {
+  return apiRequest<StartupIdeaChatResponse>("/chat/startup-idea", {
+    token: input.token ?? process.env.NEXT_PUBLIC_DEV_API_TOKEN ?? "dev",
+    body: {
+      startup_idea: input.startupIdea,
+      conversation_history: input.conversationHistory,
+    },
+  });
 }

@@ -1,11 +1,14 @@
 from functools import cached_property
+from pathlib import Path
 
 from pydantic import AnyUrl, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+BACKEND_DIR = Path(__file__).resolve().parents[2]
+
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(env_file=BACKEND_DIR / ".env", env_file_encoding="utf-8", extra="ignore")
 
     app_name: str = "FounderGPT X API"
     app_env: str = "development"
@@ -21,6 +24,7 @@ class Settings(BaseSettings):
     nvidia_base_url: AnyUrl | str = "https://integrate.api.nvidia.com/v1"
     nvidia_model: str = "meta/llama-3.1-70b-instruct"
     ai_timeout_seconds: float = 45.0
+    ai_max_tokens: int = 900
 
     @cached_property
     def is_development(self) -> bool:

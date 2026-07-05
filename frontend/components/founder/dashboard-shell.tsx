@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowUpRight, BrainCircuit, CheckCircle2, CircleAlert, Sparkles } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, CircleAlert, Sparkles } from "lucide-react";
 
 import { Sidebar } from "@/components/layout/sidebar";
+import { StartupChat } from "@/components/founder/startup-chat";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 
@@ -13,8 +14,6 @@ const metrics = [
   { label: "Investor Readiness", value: "41%", detail: "Narrative too broad" },
   { label: "Weekly Focus", value: "3", detail: "Critical moves" },
 ];
-
-const agents = ["CEO", "CTO", "Product", "VC", "Marketing", "Finance", "Legal", "UX"];
 
 export function DashboardShell() {
   return (
@@ -53,33 +52,9 @@ export function DashboardShell() {
           </section>
 
           <section className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
-            <GlassCard className="p-0">
-              <div className="border-b border-border p-5">
-                <div className="flex items-center gap-2 text-sm font-medium text-founder-ink">
-                  <BrainCircuit className="h-4 w-4 text-founder-cyan" />
-                  AI boardroom
-                </div>
-                <p className="mt-2 text-sm text-muted">
-                  Each agent gets its own operating style and pushes against weak assumptions.
-                </p>
-              </div>
-              <div className="grid gap-2 p-5 sm:grid-cols-2">
-                {agents.map((agent, index) => (
-                  <motion.div
-                    key={agent}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.03 }}
-                    className="rounded-md border border-border bg-black/20 p-4"
-                  >
-                    <div className="text-sm font-medium text-founder-ink">{agent}</div>
-                    <div className="mt-1 text-xs leading-5 text-muted">
-                      {agent === "VC" ? "Finds investor objections before investors do." : "Turns founder context into concrete next moves."}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </GlassCard>
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+              <StartupChat />
+            </motion.div>
 
             <div className="grid gap-5">
               <GlassCard>

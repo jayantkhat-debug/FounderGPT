@@ -1,7 +1,16 @@
 from openai import OpenAI
+from openai import OpenAIError
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from app.core.config import settings
+
+
+class AIConfigurationError(RuntimeError):
+    pass
+
+
+class AIProviderError(RuntimeError):
+    pass
 
 
 class NvidiaClient:
@@ -16,23 +25,39 @@ class NvidiaClient:
             timeout=settings.ai_timeout_seconds,
         )
 
-    @retry(wait=wait_exponential(multiplier=1, min=1, max=8), stop=stop_after_attempt(3))
-    def complete(self, *, system_prompt: str, user_message: str) -> str:
+    def _ensure_client(self) -> OpenAI:
         if self._client is None:
-            return (
-                "NVIDIA_API_KEY is not configured. I can still validate product strategy locally, "
-                "but live model responses require a server-side key in backend/.env."
+            raise AIConfigurationError(
+                "NVIDIA_API_KEY is not configured. Add it to backend/.env and restart the API server."
             )
+        return self._client
 
-        response = self._client.chat.completions.create(
-            model=settings.nvidia_model,
+    @retry(wait=wait_exponential(multiplier=1, min=1, max=8), stop=stop_after_attempt(3), reraise=True)
+    def complete_messages(self, *, messages: list[dict[str, str]], temperature: float = 0.35) -> str:
+        client = self._ensure_client()
+
+        try:
+            response = client.chat.completions.create(
+                model=settings.nvidia_model,
+                messages=messages,
+                temperature=temperature,
+                max_tokens=settings.ai_max_tokens,
+            )
+        except OpenAIError as exc:
+            raise AIProviderError("NVIDIA Build API request failed.") from exc
+
+        content = response.choices[0].message.content
+        if not content:
+            raise AIProviderError("NVIDIA Build API returned an empty response.")
+        return content
+
+    def complete(self, *, system_prompt: str, user_message: str) -> str:
+        return self.complete_messages(
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message},
-            ],
-            temperature=0.35,
+            ]
         )
-        return response.choices[0].message.content or ""
 
 
 nvidia_client = NvidiaClient()
