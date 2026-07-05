@@ -16,11 +16,6 @@ FounderGPT X is designed as a premium founder operating system, not another chat
 - Founder-first strategic chat
 - Critical assumption testing
 - Project and memory-ready backend architecture
-- Clerk-ready sign up, login, logout, and protected-route architecture
-- PostgreSQL persistence with Alembic migrations
-- Multi-project startup workspace
-- Founder memory per project
-- Conversation and message persistence per project
 - Business plan, pitch deck, market research, and fundraising roadmap foundations
 - Modular AI agent system for CEO, CTO, Product, VC, Marketing, Sales, Finance, Legal, Growth, Operations, UX, and Engineering roles
 - Secure server-side NVIDIA Build API integration
@@ -28,16 +23,20 @@ FounderGPT X is designed as a premium founder operating system, not another chat
 
 ## Architecture
 
-FounderGPT X is separated into production-ready application boundaries:
+FounderGPT X is organized as a production-ready monorepo with clear separation of concerns:
 
+### Directory Structure
 - `frontend/`: Next.js 15, React, TypeScript, TailwindCSS, Framer Motion
 - `backend/`: FastAPI, Pydantic, SQLAlchemy-ready domain structure, NVIDIA Build API client
-- `backend/alembic/`: PostgreSQL migrations
-- `database/`: PostgreSQL schema documentation
-- `api/`: API specification and route contracts
-- `agents/` and `prompts/`: AI agent registry, roles, and prompt strategy
-- `docs/`: architecture and implementation planning
-- `docs/engineering-audit.md`: stabilization audit notes, known gaps, and verification commands
+- `database/`: PostgreSQL schema documentation and migration scripts (alembic)
+- `api/`: API specifications and route contracts
+- `agents/`: AI agent registry and role definitions
+- `prompts/`: System prompts and agent strategies
+- `docs/`: Architecture, planning, and audit documentation
+- `scripts/`: Automation and maintenance utilities
+
+### Note on Legacy Code
+Legacy Streamlit files have been archived in `archive/legacy-streamlit/` for reference. The production application uses the new FastAPI backend and Next.js frontend exclusively.
 
 ## Tech Stack
 
@@ -65,26 +64,10 @@ NVIDIA_BASE_URL="https://integrate.api.nvidia.com/v1"
 NVIDIA_MODEL="meta/llama-3.1-70b-instruct"
 ```
 
-Set PostgreSQL and Clerk values in `backend/.env`:
-
-```text
-DATABASE_URL="postgresql+psycopg://foundergpt:foundergpt@localhost:5432/foundergpt"
-CLERK_ISSUER="https://your-clerk-instance.clerk.accounts.dev"
-CLERK_JWKS_URL="https://your-clerk-instance.clerk.accounts.dev/.well-known/jwks.json"
-CLERK_AUDIENCE=""
-```
-
 Install backend dependencies:
 
 ```powershell
 python -m pip install -r backend\requirements.txt
-```
-
-Run database migrations:
-
-```powershell
-cd backend
-python -m alembic -c alembic.ini upgrade head
 ```
 
 Install frontend dependencies:
@@ -99,14 +82,14 @@ npm.cmd install
 Start the FastAPI backend:
 
 ```powershell
-cd "<your-project-root>"
+cd "C:\Users\91797\OneDrive\FounderGPT V5"
 python -m uvicorn app.main:app --app-dir backend --reload --host 127.0.0.1 --port 8000
 ```
 
 Start the Next.js frontend in a second terminal:
 
 ```powershell
-cd "<your-project-root>\frontend"
+cd "C:\Users\91797\OneDrive\FounderGPT V5\frontend"
 npm.cmd run dev
 ```
 
@@ -125,7 +108,6 @@ http://127.0.0.1:8000/api/v1/health
 ## Roadmap
 
 - Phase 1: Authentication, dashboard, projects, AI chat, memory, NVIDIA integration
-- Phase 2 Foundation: Clerk authentication, PostgreSQL persistence, Alembic migrations, multi-project workspaces, founder memory, persisted conversations
 - Phase 2: Business plan generator, pitch deck generator, market research, competitor analysis, financial models
 - Phase 3: Investor CRM, task management, calendar, notifications, founder memory
 - Phase 4: Multi-agent collaboration, voice, documents, image generation, code generation
@@ -142,14 +124,6 @@ cd frontend
 npm.cmd run typecheck
 npm.cmd run build
 ```
-
-Engineering standards:
-
-- Keep production work inside `frontend/` and `backend/`.
-- Do not expose secrets to client code.
-- Protect owner-scoped resources at the API boundary.
-- Prefer small, typed modules over all-in-one files.
-- Update docs when architecture, setup, or API contracts change.
 
 ## License
 
