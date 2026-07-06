@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_current_db_user
@@ -10,6 +10,7 @@ from app.schemas.conversation import ConversationCreate, ConversationRead, Messa
 from app.schemas.memory import ProjectMemoryRead, ProjectMemoryUpdate
 from app.schemas.project import ProjectCreate, ProjectRead, ProjectUpdate
 from app.services.generator_service import generator_service
+from app.services.nvidia_client import AIConfigurationError, AIProviderError
 from app.services.project_service import (
     create_conversation,
     create_project,
@@ -125,7 +126,15 @@ async def generate_project_business_model(
 ):
     project = get_owned_project(db, user, project_id)
     memory = get_or_create_project_memory(db, project)
-    business_model = generator_service.generate_business_model(memory)
+    try:
+        business_model = generator_service.generate_business_model(memory)
+    except AIConfigurationError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    except AIProviderError:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="FounderGPT X could not get a response from NVIDIA Build API. Please retry.",
+        )
 
     # Persist the generated business model to project memory
     memory.revenue_model = business_model
