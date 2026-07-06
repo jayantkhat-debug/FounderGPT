@@ -26,7 +26,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className="dark">
-      <body>
+      {/* suppressHydrationWarning prevents React from erroring when browser extensions inject attributes into the DOM before hydration (e.g., Grammarly) */}
+      <body suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>
