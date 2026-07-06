@@ -13,6 +13,9 @@ class ProjectMemoryUpdate(BaseModel):
     customer: str | None = Field(default=None, max_length=12000)
     revenue_model: str | None = Field(default=None, max_length=12000)
     pricing: str | None = Field(default=None, max_length=12000)
+    business_plan: str | None = Field(default=None, max_length=12000)
+    web3_strategy: str | None = Field(default=None, max_length=12000)
+    pitch_deck: str | None = Field(default=None, max_length=12000)
     competitors: list[dict[str, Any]] | None = Field(default=None, max_length=50)
     goals: list[dict[str, Any]] | None = Field(default=None, max_length=50)
 
@@ -28,5 +31,8 @@ class ProjectMemoryRead(BaseModel):
     customer: str | None
     revenue_model: str | None
     pricing: str | None
+    business_plan: str | None
+    web3_strategy: str | None
+    pitch_deck: str | None
     competitors: list[dict[str, Any]]
     goals: list[dict[str, Any]]

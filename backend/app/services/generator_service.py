@@ -126,4 +126,45 @@ Be specific and focus on sustainable value, not hype.
 
         return nvidia_client.complete(system_prompt=prompt, user_message=user_message)
 
+    def generate_pitch_deck(self, memory: ProjectMemory) -> str:
+        project_context = (
+            f"Startup Name: {memory.startup_name or 'Unknown'}\n"
+            f"Problem: {memory.problem or 'Not defined'}\n"
+            f"Solution: {memory.solution or 'Not defined'}\n"
+            f"Target Customer: {memory.customer or 'Not defined'}\n"
+            f"Revenue Model: {memory.revenue_model or 'Not defined'}"
+        )
+
+        prompt = """
+You are FounderGPT X, a specialist in venture capital and startup storytelling.
+Generate a compelling 10-12 slide Pitch Deck outline for this startup.
+
+For each slide, provide:
+- Slide Title
+- Key Message (The "So What?")
+- Recommended Visuals/Data Points
+- Talking Points for the Founder
+
+Slides should include:
+1. Vision & Value Prop
+2. The Problem
+3. The Solution
+4. Market Opportunity (TAM/SAM/SOM)
+5. Product/Technology
+6. Revenue Model
+7. Traction & Roadmap
+8. Competitive Landscape
+9. The Team (Generic placeholders)
+10. The Ask (Funding requirements)
+
+Be punchy, persuasive, and focus on the narrative.
+""".strip()
+
+        user_message = (
+            "Generate a high-conversion pitch deck outline for the following startup.\n\n"
+            f"Context:\n{project_context}"
+        )
+
+        return nvidia_client.complete(system_prompt=prompt, user_message=user_message)
+
 generator_service = GeneratorService()

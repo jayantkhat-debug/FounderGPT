@@ -2,11 +2,11 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { CalendarDays, FolderKanban, Loader2, Plus, Briefcase, Sparkles, Landmark, FileText, Globe } from "lucide-react";
+import { CalendarDays, FolderKanban, Loader2, Plus, Briefcase, Sparkles, Landmark, FileText, Globe, BarChart3 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
-import { createProject, listProjects, generateBusinessModel, generateFinancialModel, generateBusinessPlan, generateWeb3Strategy, type Project } from "@/lib/api";
+import { createProject, listProjects, getProjectMemory, generateBusinessModel, generateFinancialModel, generateBusinessPlan, generateWeb3Strategy, generatePitchDeck, type Project } from "@/lib/api";
 
 const stages = ["Idea", "Validating", "Building", "Fundraising", "Scaling"];
 
@@ -46,10 +46,12 @@ function ProjectWorkspaceInner({
   const [isGeneratingFinance, setIsGeneratingFinance] = useState<string | null>(null);
   const [isGeneratingPlan, setIsGeneratingPlan] = useState<string | null>(null);
   const [isGeneratingWeb3, setIsGeneratingWeb3] = useState<string | null>(null);
+  const [isGeneratingDeck, setIsGeneratingDeck] = useState<string | null>(null);
   const [businessModels, setBusinessModels] = useState<Record<string, string>>({});
   const [financialModels, setFinancialModels] = useState<Record<string, string>>({});
   const [businessPlans, setBusinessPlans] = useState<Record<string, string>>({});
   const [web3Strategies, setWeb3Strategies] = useState<Record<string, string>>({});
+  const [pitchDecks, setPitchDecks] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const resolveToken = useCallback(async () => {
     if (getToken) {
@@ -62,9 +64,37 @@ function ProjectWorkspaceInner({
   useEffect(() => {
     let active = true;
     resolveToken()
-      .then((token) => listProjects(token))
-      .then((data) => {
-        if (active) setProjects(data);
+      .then(async (token) => {
+        const data = await listProjects(token);
+        if (!active) return;
+        setProjects(data);
+
+        // Hydrate models for each project in parallel
+        await Promise.all(
+          data.map(async (project) => {
+            try {
+              const memory = await getProjectMemory(project.id, token);
+              if (!active) return;
+              if (memory.revenue_model) {
+                setBusinessModels((curr) => ({ ...curr, [project.id]: memory.revenue_model! }));
+              }
+              if (memory.pricing) {
+                setFinancialModels((curr) => ({ ...curr, [project.id]: memory.pricing! }));
+              }
+              if (memory.business_plan) {
+                setBusinessPlans((curr) => ({ ...curr, [project.id]: memory.business_plan! }));
+              }
+              if (memory.web3_strategy) {
+                setWeb3Strategies((curr) => ({ ...curr, [project.id]: memory.web3_strategy! }));
+              }
+              if (memory.pitch_deck) {
+                setPitchDecks((curr) => ({ ...curr, [project.id]: memory.pitch_deck! }));
+              }
+            } catch (err) {
+              console.error(`Could not hydrate memory for project ${project.id}`, err);
+            }
+          })
+        );
       })
       .catch((caught) => {
         if (active) setError(caught instanceof Error ? caught.message : "Could not load projects.");
@@ -150,6 +180,25 @@ function ProjectWorkspaceInner({
       setError(caught instanceof Error ? caught.message : "Could not generate Web3 strategy.");
     } finally {
       setIsGeneratingWeb3(null);
+    }
+  }
+
+  async function handleGeneratePitchDeck(projectId: string) {
+    if (isGeneratingDeck) return;
+
+    setIsGeneratingDeck(projectId);
+    setError(null);
+    try {
+      const token = await resolveToken();
+      const result = await generatePitchDeck(projectId, token);
+      setPitchDecks((current) => ({
+        ...current,
+        [projectId]: result.pitch_deck,
+      }));
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not generate pitch deck.");
+    } finally {
+      setIsGeneratingDeck(null);
     }
   }
 
@@ -290,6 +339,18 @@ function ProjectWorkspaceInner({
                     </div>
                   </div>
                 )}
+
+                {pitchDecks[project.id] && (
+                  <div className="rounded-md border border-founder-violet/20 bg-founder-violet/5 p-4 text-sm text-founder-ink md:col-span-2">
+                    <div className="mb-2 flex items-center gap-2 font-medium text-founder-violet">
+                      <BarChart3 className="h-4 w-4" />
+                      Pitch Deck Outline
+                    </div>
+                    <div className="max-h-80 overflow-y-auto whitespace-pre-wrap text-muted text-xs leading-5">
+                      {pitchDecks[project.id]}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="mt-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -349,6 +410,19 @@ function ProjectWorkspaceInner({
                       <Globe className="h-3 w-3 text-founder-cyan" />
                     )}
                     {web3Strategies[project.id] ? "Update Web3" : "Gen Web3"}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    className="h-8 gap-2 text-xs"
+                    onClick={() => handleGeneratePitchDeck(project.id)}
+                    disabled={isGeneratingDeck === project.id}
+                  >
+                    {isGeneratingDeck === project.id ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <BarChart3 className="h-3 w-3 text-founder-violet" />
+                    )}
+                    {pitchDecks[project.id] ? "Update Deck" : "Gen Deck"}
                   </Button>
                 </div>
               </div>

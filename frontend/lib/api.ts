@@ -45,6 +45,9 @@ export type ProjectMemory = {
   customer: string | null;
   revenue_model: string | null;
   pricing: string | null;
+  business_plan: string | null;
+  web3_strategy: string | null;
+  pitch_deck: string | null;
   competitors: Record<string, unknown>[];
   goals: Record<string, unknown>[];
 };
@@ -159,6 +162,16 @@ export async function generateBusinessModel(
   token = process.env.NEXT_PUBLIC_DEV_API_TOKEN ?? "dev",
 ) {
   return apiRequest<{ business_model: string }>(`/projects/${projectId}/generate-business-model`, {
+    token,
+    method: "POST",
+  });
+}
+
+export async function generatePitchDeck(
+  projectId: string,
+  token = process.env.NEXT_PUBLIC_DEV_API_TOKEN ?? "dev",
+) {
+  return apiRequest<{ pitch_deck: string }>(`/projects/${projectId}/generate-pitch-deck`, {
     token,
     method: "POST",
   });

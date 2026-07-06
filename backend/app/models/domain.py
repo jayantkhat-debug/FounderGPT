@@ -126,6 +126,9 @@ class ProjectMemory(Base, TimestampMixin):
     customer: Mapped[str | None] = mapped_column(Text)
     revenue_model: Mapped[str | None] = mapped_column(Text)
     pricing: Mapped[str | None] = mapped_column(Text)
+    business_plan: Mapped[str | None] = mapped_column(Text)
+    web3_strategy: Mapped[str | None] = mapped_column(Text)
+    pitch_deck: Mapped[str | None] = mapped_column(Text)
     competitors: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, default=list)
     goals: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, default=list)
 
