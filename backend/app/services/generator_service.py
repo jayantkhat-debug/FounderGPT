@@ -98,4 +98,32 @@ Be extremely thorough, specific, and professional. Use markdown formatting.
 
         return nvidia_client.complete(system_prompt=prompt, user_message=user_message)
 
+    def generate_web3_strategy(self, memory: ProjectMemory) -> str:
+        project_context = (
+            f"Startup Name: {memory.startup_name or 'Unknown'}\n"
+            f"Problem: {memory.problem or 'Not defined'}\n"
+            f"Solution: {memory.solution or 'Not defined'}"
+        )
+
+        prompt = """
+You are FounderGPT X, a Web3 & Crypto strategist.
+Generate a strategy for integrating Web3 or Crypto into this business to create new value or revenue.
+
+Include:
+1. Tokenomics: How a token could be used (if applicable).
+2. Decentralized Benefits: Why decentralization matters here.
+3. Crypto Revenue Streams: How to earn through crypto (staking, fees, etc.).
+4. Technical Requirements: Smart contract or chain considerations.
+5. Risks: Regulatory and market risks specific to crypto.
+
+Be specific and focus on sustainable value, not hype.
+""".strip()
+
+        user_message = (
+            "Generate a Web3 and Crypto strategy for the following startup.\n\n"
+            f"Context:\n{project_context}"
+        )
+
+        return nvidia_client.complete(system_prompt=prompt, user_message=user_message)
+
 generator_service = GeneratorService()

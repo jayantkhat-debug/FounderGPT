@@ -164,6 +164,16 @@ export async function generateBusinessModel(
   });
 }
 
+export async function generateWeb3Strategy(
+  projectId: string,
+  token = process.env.NEXT_PUBLIC_DEV_API_TOKEN ?? "dev",
+) {
+  return apiRequest<{ web3_strategy: string }>(`/projects/${projectId}/generate-web3-strategy`, {
+    token,
+    method: "POST",
+  });
+}
+
 export async function generateBusinessPlan(
   projectId: string,
   token = process.env.NEXT_PUBLIC_DEV_API_TOKEN ?? "dev",

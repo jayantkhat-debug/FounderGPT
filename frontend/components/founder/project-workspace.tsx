@@ -2,11 +2,11 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { CalendarDays, FolderKanban, Loader2, Plus, Briefcase, Sparkles, Landmark, FileText } from "lucide-react";
+import { CalendarDays, FolderKanban, Loader2, Plus, Briefcase, Sparkles, Landmark, FileText, Globe } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
-import { createProject, listProjects, generateBusinessModel, generateFinancialModel, generateBusinessPlan, type Project } from "@/lib/api";
+import { createProject, listProjects, generateBusinessModel, generateFinancialModel, generateBusinessPlan, generateWeb3Strategy, type Project } from "@/lib/api";
 
 const stages = ["Idea", "Validating", "Building", "Fundraising", "Scaling"];
 
@@ -45,9 +45,11 @@ function ProjectWorkspaceInner({
   const [isGenerating, setIsGenerating] = useState<string | null>(null);
   const [isGeneratingFinance, setIsGeneratingFinance] = useState<string | null>(null);
   const [isGeneratingPlan, setIsGeneratingPlan] = useState<string | null>(null);
+  const [isGeneratingWeb3, setIsGeneratingWeb3] = useState<string | null>(null);
   const [businessModels, setBusinessModels] = useState<Record<string, string>>({});
   const [financialModels, setFinancialModels] = useState<Record<string, string>>({});
   const [businessPlans, setBusinessPlans] = useState<Record<string, string>>({});
+  const [web3Strategies, setWeb3Strategies] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const resolveToken = useCallback(async () => {
     if (getToken) {
@@ -129,6 +131,25 @@ function ProjectWorkspaceInner({
       setError(caught instanceof Error ? caught.message : "Could not generate business plan.");
     } finally {
       setIsGeneratingPlan(null);
+    }
+  }
+
+  async function handleGenerateWeb3Strategy(projectId: string) {
+    if (isGeneratingWeb3) return;
+
+    setIsGeneratingWeb3(projectId);
+    setError(null);
+    try {
+      const token = await resolveToken();
+      const result = await generateWeb3Strategy(projectId, token);
+      setWeb3Strategies((current) => ({
+        ...current,
+        [projectId]: result.web3_strategy,
+      }));
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not generate Web3 strategy.");
+    } finally {
+      setIsGeneratingWeb3(null);
     }
   }
 
@@ -257,6 +278,18 @@ function ProjectWorkspaceInner({
                     </div>
                   </div>
                 )}
+
+                {web3Strategies[project.id] && (
+                  <div className="rounded-md border border-founder-cyan/20 bg-founder-cyan/5 p-4 text-sm text-founder-ink md:col-span-2">
+                    <div className="mb-2 flex items-center gap-2 font-medium text-founder-cyan">
+                      <Globe className="h-4 w-4" />
+                      Web3 Strategy
+                    </div>
+                    <div className="max-h-60 overflow-y-auto whitespace-pre-wrap text-muted text-xs leading-5">
+                      {web3Strategies[project.id]}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="mt-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -303,6 +336,19 @@ function ProjectWorkspaceInner({
                       <FileText className="h-3 w-3 text-founder-green" />
                     )}
                     {businessPlans[project.id] ? "Update Plan" : "Gen Plan"}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    className="h-8 gap-2 text-xs"
+                    onClick={() => handleGenerateWeb3Strategy(project.id)}
+                    disabled={isGeneratingWeb3 === project.id}
+                  >
+                    {isGeneratingWeb3 === project.id ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <Globe className="h-3 w-3 text-founder-cyan" />
+                    )}
+                    {web3Strategies[project.id] ? "Update Web3" : "Gen Web3"}
                   </Button>
                 </div>
               </div>

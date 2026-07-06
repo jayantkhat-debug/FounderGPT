@@ -102,6 +102,13 @@ AGENTS: dict[str, AgentProfile] = {
         personality="Rigorous, test-minded, production-focused",
         system_prompt=f"{BASE_BEHAVIOR} Translate product intent into maintainable, typed, tested engineering work.",
     ),
+    "web3": AgentProfile(
+        key="web3",
+        name="Web3 Strategist",
+        specialty="Tokenomics, decentralization, smart contracts, crypto market fit",
+        personality="Forward-thinking, risk-aware, technically deep",
+        system_prompt=f"{BASE_BEHAVIOR} Evaluate Web3 opportunities, tokenomics, and decentralized business models.",
+    ),
 }
 
 

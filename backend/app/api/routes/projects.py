@@ -190,3 +190,24 @@ async def generate_project_business_plan(
     # but for now, we'll return it and ideally it would be stored as a Document.
     # To keep it simple and consistent with the current "Operating System" phase:
     return {"business_plan": business_plan}
+
+
+@router.post("/{project_id}/generate-web3-strategy")
+async def generate_project_web3_strategy(
+    project_id: UUID,
+    user: User = Depends(get_current_db_user),
+    db: Session = Depends(get_db),
+):
+    project = get_owned_project(db, user, project_id)
+    memory = get_or_create_project_memory(db, project)
+    try:
+        web3_strategy = generator_service.generate_web3_strategy(memory)
+    except AIConfigurationError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    except AIProviderError:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="FounderGPT X could not get a response from NVIDIA Build API. Please retry.",
+        )
+
+    return {"web3_strategy": web3_strategy}
