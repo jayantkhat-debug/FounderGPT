@@ -153,3 +153,13 @@ export async function listMessages(
 ) {
   return apiRequest<PersistedMessage[]>(`/projects/${projectId}/conversations/${conversationId}/messages`, { token });
 }
+
+export async function generateBusinessModel(
+  projectId: string,
+  token = process.env.NEXT_PUBLIC_DEV_API_TOKEN ?? "dev",
+) {
+  return apiRequest<{ business_model: string }>(`/projects/${projectId}/generate-business-model`, {
+    token,
+    method: "POST",
+  });
+}

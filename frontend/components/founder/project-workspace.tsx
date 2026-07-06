@@ -2,11 +2,11 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { CalendarDays, FolderKanban, Loader2, Plus } from "lucide-react";
+import { CalendarDays, FolderKanban, Loader2, Plus, Briefcase, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
-import { createProject, listProjects, type Project } from "@/lib/api";
+import { createProject, listProjects, generateBusinessModel, type Project } from "@/lib/api";
 
 const stages = ["Idea", "Validating", "Building", "Fundraising", "Scaling"];
 
@@ -42,6 +42,8 @@ function ProjectWorkspaceInner({
   const [stage, setStage] = useState(stages[0]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState<string | null>(null);
+  const [businessModels, setBusinessModels] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const resolveToken = useCallback(async () => {
     if (getToken) {
@@ -68,6 +70,25 @@ function ProjectWorkspaceInner({
       active = false;
     };
   }, [resolveToken, tokenMode]);
+
+  async function handleGenerateBusinessModel(projectId: string) {
+    if (isGenerating) return;
+
+    setIsGenerating(projectId);
+    setError(null);
+    try {
+      const token = await resolveToken();
+      const result = await generateBusinessModel(projectId, token);
+      setBusinessModels((current) => ({
+        ...current,
+        [projectId]: result.business_model,
+      }));
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not generate business model.");
+    } finally {
+      setIsGenerating(null);
+    }
+  }
 
   async function handleCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -157,9 +178,37 @@ function ProjectWorkspaceInner({
                 </div>
                 <span className="rounded-md border border-border px-2.5 py-1 text-xs text-muted">{project.stage}</span>
               </div>
-              <div className="mt-4 flex items-center gap-2 text-xs text-muted">
-                <CalendarDays className="h-3.5 w-3.5" />
-                Updated {new Date(project.updated_at).toLocaleDateString()}
+
+              {businessModels[project.id] && (
+                <div className="mt-4 rounded-md border border-founder-cyan/20 bg-founder-cyan/5 p-4 text-sm text-founder-ink">
+                  <div className="mb-2 flex items-center gap-2 font-medium text-founder-cyan">
+                    <Briefcase className="h-4 w-4" />
+                    Business Model
+                  </div>
+                  <div className="whitespace-pre-wrap text-muted text-xs leading-5">
+                    {businessModels[project.id]}
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-2 text-xs text-muted">
+                  <CalendarDays className="h-3.5 w-3.5" />
+                  Updated {new Date(project.updated_at).toLocaleDateString()}
+                </div>
+                <Button
+                  variant="secondary"
+                  className="h-8 gap-2 text-xs"
+                  onClick={() => handleGenerateBusinessModel(project.id)}
+                  disabled={isGenerating === project.id}
+                >
+                  {isGenerating === project.id ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-3 w-3 text-founder-cyan" />
+                  )}
+                  {businessModels[project.id] ? "Regenerate Model" : "Generate Model"}
+                </Button>
               </div>
             </div>
           ))}
