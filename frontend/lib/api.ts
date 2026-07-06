@@ -163,3 +163,23 @@ export async function generateBusinessModel(
     method: "POST",
   });
 }
+
+export async function generateBusinessPlan(
+  projectId: string,
+  token = process.env.NEXT_PUBLIC_DEV_API_TOKEN ?? "dev",
+) {
+  return apiRequest<{ business_plan: string }>(`/projects/${projectId}/generate-business-plan`, {
+    token,
+    method: "POST",
+  });
+}
+
+export async function generateFinancialModel(
+  projectId: string,
+  token = process.env.NEXT_PUBLIC_DEV_API_TOKEN ?? "dev",
+) {
+  return apiRequest<{ financial_model: string }>(`/projects/${projectId}/generate-financial-model`, {
+    token,
+    method: "POST",
+  });
+}

@@ -141,3 +141,52 @@ async def generate_project_business_model(
     db.commit()
 
     return {"business_model": business_model}
+
+
+@router.post("/{project_id}/generate-financial-model")
+async def generate_project_financial_model(
+    project_id: UUID,
+    user: User = Depends(get_current_db_user),
+    db: Session = Depends(get_db),
+):
+    project = get_owned_project(db, user, project_id)
+    memory = get_or_create_project_memory(db, project)
+    try:
+        financial_model = generator_service.generate_financial_model(memory)
+    except AIConfigurationError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    except AIProviderError:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="FounderGPT X could not get a response from NVIDIA Build API. Please retry.",
+        )
+
+    # Persist the generated financial model to project memory
+    memory.pricing = financial_model
+    db.commit()
+
+    return {"financial_model": financial_model}
+
+
+@router.post("/{project_id}/generate-business-plan")
+async def generate_project_business_plan(
+    project_id: UUID,
+    user: User = Depends(get_current_db_user),
+    db: Session = Depends(get_db),
+):
+    project = get_owned_project(db, user, project_id)
+    memory = get_or_create_project_memory(db, project)
+    try:
+        business_plan = generator_service.generate_business_plan(memory)
+    except AIConfigurationError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    except AIProviderError:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="FounderGPT X could not get a response from NVIDIA Build API. Please retry.",
+        )
+
+    # Note: We don't necessarily want to dump the whole business plan into a single memory field,
+    # but for now, we'll return it and ideally it would be stored as a Document.
+    # To keep it simple and consistent with the current "Operating System" phase:
+    return {"business_plan": business_plan}

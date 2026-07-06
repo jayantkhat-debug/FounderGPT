@@ -12,6 +12,7 @@ from app.services.nvidia_client import AIConfigurationError, AIProviderError
 from app.services.chat_service import chat_service
 from app.services.project_service import (
     create_conversation,
+    get_or_create_project_memory,
     get_owned_conversation,
     get_owned_project,
     store_message,
@@ -29,6 +30,7 @@ async def chat_with_agent(
     db: Session = Depends(get_db),
 ) -> ChatResponse:
     project = get_owned_project(db, user, project_id)
+    memory = get_or_create_project_memory(db, project)
     conversation = (
         get_owned_conversation(db, project, request.conversation_id)
         if request.conversation_id
@@ -36,7 +38,7 @@ async def chat_with_agent(
     )
     store_message(db, conversation, role=MessageRole.user, content=request.message, agent_key=request.agent_key)
     try:
-        response = chat_service.respond(request)
+        response = chat_service.respond(request, memory=memory)
     except AIConfigurationError as exc:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
     except AIProviderError as exc:

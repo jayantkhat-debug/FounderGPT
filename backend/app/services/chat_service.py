@@ -1,4 +1,5 @@
 from app.agents.registry import get_agent
+from app.models import ProjectMemory
 from app.schemas.chat import ChatRequest, ChatResponse, StartupIdeaChatRequest, StartupIdeaChatResponse
 from app.services.nvidia_client import nvidia_client
 
@@ -26,10 +27,22 @@ Response format:
 
 
 class ChatService:
-    def respond(self, request: ChatRequest) -> ChatResponse:
+    def respond(self, request: ChatRequest, memory: ProjectMemory | None = None) -> ChatResponse:
         agent = get_agent(request.agent_key)
+
+        memory_context = ""
+        if memory:
+            memory_context = (
+                "\n\nProject Context:\n"
+                f"- Startup: {memory.startup_name or 'N/A'}\n"
+                f"- Problem: {memory.problem or 'N/A'}\n"
+                f"- Solution: {memory.solution or 'N/A'}\n"
+                f"- Revenue Model: {memory.revenue_model or 'N/A'}\n"
+            )
+
         prompt = (
-            f"{agent.system_prompt}\n\n"
+            f"{agent.system_prompt}\n"
+            f"{memory_context}\n"
             f"Workflow: {request.workflow}\n"
             "Use this response structure: critical assessment, follow-up questions if needed, recommended next actions."
         )

@@ -2,11 +2,11 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { CalendarDays, FolderKanban, Loader2, Plus, Briefcase, Sparkles } from "lucide-react";
+import { CalendarDays, FolderKanban, Loader2, Plus, Briefcase, Sparkles, Landmark, FileText } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
-import { createProject, listProjects, generateBusinessModel, type Project } from "@/lib/api";
+import { createProject, listProjects, generateBusinessModel, generateFinancialModel, generateBusinessPlan, type Project } from "@/lib/api";
 
 const stages = ["Idea", "Validating", "Building", "Fundraising", "Scaling"];
 
@@ -43,7 +43,11 @@ function ProjectWorkspaceInner({
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [isGenerating, setIsGenerating] = useState<string | null>(null);
+  const [isGeneratingFinance, setIsGeneratingFinance] = useState<string | null>(null);
+  const [isGeneratingPlan, setIsGeneratingPlan] = useState<string | null>(null);
   const [businessModels, setBusinessModels] = useState<Record<string, string>>({});
+  const [financialModels, setFinancialModels] = useState<Record<string, string>>({});
+  const [businessPlans, setBusinessPlans] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const resolveToken = useCallback(async () => {
     if (getToken) {
@@ -87,6 +91,44 @@ function ProjectWorkspaceInner({
       setError(caught instanceof Error ? caught.message : "Could not generate business model.");
     } finally {
       setIsGenerating(null);
+    }
+  }
+
+  async function handleGenerateFinancialModel(projectId: string) {
+    if (isGeneratingFinance) return;
+
+    setIsGeneratingFinance(projectId);
+    setError(null);
+    try {
+      const token = await resolveToken();
+      const result = await generateFinancialModel(projectId, token);
+      setFinancialModels((current) => ({
+        ...current,
+        [projectId]: result.financial_model,
+      }));
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not generate financial model.");
+    } finally {
+      setIsGeneratingFinance(null);
+    }
+  }
+
+  async function handleGenerateBusinessPlan(projectId: string) {
+    if (isGeneratingPlan) return;
+
+    setIsGeneratingPlan(projectId);
+    setError(null);
+    try {
+      const token = await resolveToken();
+      const result = await generateBusinessPlan(projectId, token);
+      setBusinessPlans((current) => ({
+        ...current,
+        [projectId]: result.business_plan,
+      }));
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not generate business plan.");
+    } finally {
+      setIsGeneratingPlan(null);
     }
   }
 
@@ -179,36 +221,90 @@ function ProjectWorkspaceInner({
                 <span className="rounded-md border border-border px-2.5 py-1 text-xs text-muted">{project.stage}</span>
               </div>
 
-              {businessModels[project.id] && (
-                <div className="mt-4 rounded-md border border-founder-cyan/20 bg-founder-cyan/5 p-4 text-sm text-founder-ink">
-                  <div className="mb-2 flex items-center gap-2 font-medium text-founder-cyan">
-                    <Briefcase className="h-4 w-4" />
-                    Business Model
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                {businessModels[project.id] && (
+                  <div className="rounded-md border border-founder-cyan/20 bg-founder-cyan/5 p-4 text-sm text-founder-ink">
+                    <div className="mb-2 flex items-center gap-2 font-medium text-founder-cyan">
+                      <Briefcase className="h-4 w-4" />
+                      Business Model
+                    </div>
+                    <div className="max-h-60 overflow-y-auto whitespace-pre-wrap text-muted text-xs leading-5">
+                      {businessModels[project.id]}
+                    </div>
                   </div>
-                  <div className="whitespace-pre-wrap text-muted text-xs leading-5">
-                    {businessModels[project.id]}
-                  </div>
-                </div>
-              )}
+                )}
 
-              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                {financialModels[project.id] && (
+                  <div className="rounded-md border border-founder-violet/20 bg-founder-violet/5 p-4 text-sm text-founder-ink">
+                    <div className="mb-2 flex items-center gap-2 font-medium text-founder-violet">
+                      <Landmark className="h-4 w-4" />
+                      Financial Model
+                    </div>
+                    <div className="max-h-60 overflow-y-auto whitespace-pre-wrap text-muted text-xs leading-5">
+                      {financialModels[project.id]}
+                    </div>
+                  </div>
+                )}
+
+                {businessPlans[project.id] && (
+                  <div className="rounded-md border border-founder-green/20 bg-founder-green/5 p-4 text-sm text-founder-ink md:col-span-2">
+                    <div className="mb-2 flex items-center gap-2 font-medium text-founder-green">
+                      <FileText className="h-4 w-4" />
+                      Business Plan
+                    </div>
+                    <div className="max-h-80 overflow-y-auto whitespace-pre-wrap text-muted text-xs leading-5">
+                      {businessPlans[project.id]}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex items-center gap-2 text-xs text-muted">
                   <CalendarDays className="h-3.5 w-3.5" />
                   Updated {new Date(project.updated_at).toLocaleDateString()}
                 </div>
-                <Button
-                  variant="secondary"
-                  className="h-8 gap-2 text-xs"
-                  onClick={() => handleGenerateBusinessModel(project.id)}
-                  disabled={isGenerating === project.id}
-                >
-                  {isGenerating === project.id ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    <Sparkles className="h-3 w-3 text-founder-cyan" />
-                  )}
-                  {businessModels[project.id] ? "Regenerate Model" : "Generate Model"}
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="secondary"
+                    className="h-8 gap-2 text-xs"
+                    onClick={() => handleGenerateBusinessModel(project.id)}
+                    disabled={isGenerating === project.id}
+                  >
+                    {isGenerating === project.id ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <Briefcase className="h-3 w-3 text-founder-cyan" />
+                    )}
+                    {businessModels[project.id] ? "Update Business" : "Gen Business"}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    className="h-8 gap-2 text-xs"
+                    onClick={() => handleGenerateFinancialModel(project.id)}
+                    disabled={isGeneratingFinance === project.id}
+                  >
+                    {isGeneratingFinance === project.id ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <Landmark className="h-3 w-3 text-founder-violet" />
+                    )}
+                    {financialModels[project.id] ? "Update Finance" : "Gen Finance"}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    className="h-8 gap-2 text-xs"
+                    onClick={() => handleGenerateBusinessPlan(project.id)}
+                    disabled={isGeneratingPlan === project.id}
+                  >
+                    {isGeneratingPlan === project.id ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <FileText className="h-3 w-3 text-founder-green" />
+                    )}
+                    {businessPlans[project.id] ? "Update Plan" : "Gen Plan"}
+                  </Button>
+                </div>
               </div>
             </div>
           ))}

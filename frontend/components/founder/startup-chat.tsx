@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { AlertCircle, Loader2, Send, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,24 @@ const starterMessages: ConversationMessage[] = [
 ];
 
 export function StartupChat() {
+  if (process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+    return <ClerkStartupChat />;
+  }
+
+  return <StartupChatInner />;
+}
+
+function ClerkStartupChat() {
+  const { getToken } = useAuth();
+  const resolveClerkToken = useCallback(async () => {
+    const token = await getToken();
+    return token ?? undefined;
+  }, [getToken]);
+
+  return <StartupChatInner getToken={resolveClerkToken} />;
+}
+
+function StartupChatInner({ getToken }: { getToken?: () => Promise<string | undefined> }) {
   const [startupIdea, setStartupIdea] = useState("");
   const [messages, setMessages] = useState<ConversationMessage[]>(starterMessages);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,9 +65,11 @@ export function StartupChat() {
     setIsLoading(true);
 
     try {
+      const token = getToken ? await getToken() : undefined;
       const result = await evaluateStartupIdea({
         startupIdea: trimmedIdea,
         conversationHistory: messages.slice(1),
+        token,
       });
 
       setMessages((current) => [
