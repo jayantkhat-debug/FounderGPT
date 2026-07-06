@@ -64,6 +64,17 @@ function StartupChatInner({ getToken }: { getToken?: () => Promise<string | unde
     setError(null);
     setIsLoading(true);
 
+    // quick local guard: if API health known to be down, fail fast
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const apiOk = typeof window !== "undefined" ? window.__FGPT_API_OK : undefined;
+    if (apiOk === false) {
+      setError("FounderGPT X backend unreachable. Please try again later or retry the API check in the banner.");
+      setMessages((current) => current.filter((item) => item !== userMessage));
+      setStartupIdea(trimmedIdea);
+      return;
+    }
+
     try {
       const token = getToken ? await getToken() : undefined;
       const result = await evaluateStartupIdea({

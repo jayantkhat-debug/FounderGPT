@@ -19,16 +19,16 @@ import { AuthActions } from "@/components/layout/auth-actions";
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Projects", href: "/projects", icon: FolderKanban },
-  { label: "AI Chat", href: "/dashboard", icon: Bot },
-  { label: "Business Plan", href: "/dashboard", icon: FileText },
-  { label: "Pitch Deck", href: "/dashboard", icon: BarChart3 },
-  { label: "Market Research", href: "/dashboard", icon: LineChart },
-  { label: "Competitors", href: "/dashboard", icon: Users },
-  { label: "Financial Model", href: "/dashboard", icon: BriefcaseBusiness },
-  { label: "YC Application", href: "/dashboard", icon: ClipboardList },
-  { label: "Investor CRM", href: "/dashboard", icon: Landmark },
-  { label: "Tasks", href: "/dashboard", icon: CalendarDays },
-  { label: "Settings", href: "/dashboard", icon: Settings },
+  { label: "AI Chat", href: "/ai-chat", icon: Bot },
+  { label: "Business Plan", href: "/business-plan", icon: FileText },
+  { label: "Pitch Deck", href: "/pitch-deck", icon: BarChart3 },
+  { label: "Market Research", href: "/market-research", icon: LineChart },
+  { label: "Competitors", href: "/competitors", icon: Users },
+  { label: "Financial Model", href: "/financial-model", icon: BriefcaseBusiness },
+  { label: "YC Application", href: "/yc-application", icon: ClipboardList },
+  { label: "Investor CRM", href: "/investor-crm", icon: Landmark },
+  { label: "Tasks", href: "/tasks", icon: CalendarDays },
+  { label: "Settings", href: "/settings", icon: Settings },
 ];
 
 export function Sidebar() {

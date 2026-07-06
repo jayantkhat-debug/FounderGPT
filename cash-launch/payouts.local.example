@@ -1,0 +1,10 @@
+# Local payouts config (DO NOT COMMIT)
+# Copy this file to `payouts.local` and fill the values.
+
+BANK_NAME=Your bank name here
+ACCOUNT_TITLE=Your account title here
+ACCOUNT_NUMBER=Your account number here
+IBAN=Your IBAN here
+CURRENCY=Your currency code (e.g., AED)
+BRANCH=Your branch name here
+SWIFT_CODE=Your SWIFT/BIC code here
