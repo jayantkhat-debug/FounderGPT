@@ -9,6 +9,7 @@ from app.models import User
 from app.schemas.conversation import ConversationCreate, ConversationRead, MessageRead
 from app.schemas.memory import ProjectMemoryRead, ProjectMemoryUpdate
 from app.schemas.project import ProjectCreate, ProjectRead, ProjectUpdate
+from app.services.generator_service import generator_service
 from app.services.project_service import (
     create_conversation,
     create_project,
@@ -114,3 +115,20 @@ async def list_user_project_messages(
     project = get_owned_project(db, user, project_id)
     conversation = get_owned_conversation(db, project, conversation_id)
     return get_conversation_messages(db, conversation)
+
+
+@router.post("/{project_id}/generate-business-model")
+async def generate_project_business_model(
+    project_id: UUID,
+    user: User = Depends(get_current_db_user),
+    db: Session = Depends(get_db),
+):
+    project = get_owned_project(db, user, project_id)
+    memory = get_or_create_project_memory(db, project)
+    business_model = generator_service.generate_business_model(memory)
+
+    # Persist the generated business model to project memory
+    memory.revenue_model = business_model
+    db.commit()
+
+    return {"business_model": business_model}
