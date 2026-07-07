@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
@@ -10,7 +12,7 @@ export default function NotFound() {
           Return to the AI Operating System for Founders and keep building.
         </p>
         <Button asChild className="mt-6">
-          <a href="/">Back to FounderGPT X</a>
+          <Link href="/">Back to FounderGPT X</Link>
         </Button>
       </div>
     </main>

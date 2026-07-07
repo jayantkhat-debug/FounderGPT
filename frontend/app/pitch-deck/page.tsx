@@ -1,8 +1,10 @@
+import { PlaceholderPage } from "@/components/layout/placeholder-page";
+
 export default function PitchDeckPage() {
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-semibold">Pitch Deck</h1>
-      <p className="mt-3 text-sm text-muted">Placeholder page for Pitch Deck. Content coming soon.</p>
-    </div>
+    <PlaceholderPage
+      title="Pitch Deck"
+      description="Build an investor-ready pitch deck from your validated startup narrative."
+    />
   );
 }

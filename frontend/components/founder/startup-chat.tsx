@@ -53,6 +53,7 @@ export function StartupChat() {
       setError("FounderGPT X backend unreachable. Please try again later or retry the API check in the banner.");
       setMessages((current) => current.filter((item) => item !== userMessage));
       setStartupIdea(trimmedIdea);
+      setIsLoading(false);
       return;
     }
 

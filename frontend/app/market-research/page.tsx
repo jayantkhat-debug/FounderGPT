@@ -1,8 +1,10 @@
+import { PlaceholderPage } from "@/components/layout/placeholder-page";
+
 export default function MarketResearchPage() {
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-semibold">Market Research</h1>
-      <p className="mt-3 text-sm text-muted">Placeholder for Market Research tools.</p>
-    </div>
+    <PlaceholderPage
+      title="Market Research"
+      description="Analyze market size, trends, and buyer segments for your startup wedge."
+    />
   );
 }

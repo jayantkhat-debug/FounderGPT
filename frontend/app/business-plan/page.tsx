@@ -1,8 +1,10 @@
+import { PlaceholderPage } from "@/components/layout/placeholder-page";
+
 export default function BusinessPlanPage() {
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-semibold">Business Plan</h1>
-      <p className="mt-3 text-sm text-muted">Placeholder for Business Plan workspace.</p>
-    </div>
+    <PlaceholderPage
+      title="Business Plan"
+      description="Generate and refine a founder-grade business plan from your startup memory."
+    />
   );
 }
